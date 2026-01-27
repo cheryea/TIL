@@ -1,28 +1,61 @@
 -- DDL: 데이터베이스의 구조(테이블) 를 정의하는 명령어
 # 기본적인 테이블 생성
-CREATE TABLE student (
-    id VARCHAR(7) PRIMARY KEY,
-    name VARCHAR(10),
-    grade INT, 
-    major VARCHAR(20)
+-- 전공 테이블
+CREATE TABLE major (
+    id INT PRIMARY KEY,
+    major_name VARCHAR(50)
 );
 
+
+-- 학생 테이블
+CREATE TABLE student (
+    id INT PRIMARY KEY,
+    name VARCHAR(50),
+    grade INT,
+    major VARCHAR(50),
+    major_id INT,
+    mentor_id INT
+);
+
+# > student 테이블 삭제
+DROP TABLE student;
+-- student 테이블 자체를 완전히 삭제 (데이터 + 구조 모두 삭제)
+
+
+# > 존재하면 삭제 (오류 방지)
+DROP TABLE IF EXISTS student;
+-- student 테이블이 있으면 삭제, 없으면 오류 없이 넘어감
 
 
 -- DML: 테이블 안의 데이터를 조회·추가·수정·삭제하는 명령어
 # - 새로운 데이터 추가
-INSERT INTO student VALUES 
-    ('2024002', '이영희', 2, '경영학'),
-    ('2024003', '박민수', 3, '물리학');
+-- 전공 데이터
+INSERT INTO major (id, major_name) VALUES
+    (1, '컴퓨터공학'),
+    (2, '경영학'),
+    (3, '수학'),
+    (4, '물리학');   -- 학생 없는 전공 (RIGHT / FULL JOIN 확인용)
+
+
+-- 학생 데이터
+INSERT INTO student (id, name, grade, major, major_id, mentor_id) VALUES
+    (2024001, '철수', 3, '컴퓨터공학', 1, NULL),     -- 멘토 없음
+    (2024002, '영희', 2, NULL,        NULL, 2024001), -- 전공 없음 (LEFT JOIN용)
+    (2024003, '민수', 1, '수학',       3, 2024001),
+    (2024004, '지은', 2, '컴퓨터공학', 1, 2024003),
+    (2024005, '호준', 3, '경영학',     2, 2024001),
+    (2024006, '서연', 3, '컴퓨터공학', 1, 2024001);
+
+
 
 # ==================================================
 # 컬럼이 띄어쓰기가 있는 경우, ""로 감싸서 하나의 컬럼명으로 인식하게 한다.
 # 문자의 경우 '' (홑따옴표)를 사용한다.
 
-
 # SQL 문법 순서
 -- SELECT
 -- FROM
+-- └ JOIN
 -- WHERE
 -- GROUP BY
 -- HAVING
@@ -135,6 +168,7 @@ ORDER BY grade DESC, name ASC;
 
 # ==================================================
 # - GROUP BY : 그룹화 (집계)
+# : GROUP BY는 “집계 결과를 어떤 단위(= ~별)로 보고 싶은지”를 적는 것
 # ==================================================
 
 # > 학년별 학생 수
@@ -248,12 +282,103 @@ WHERE id = '2024003';
 # - JOIN : 테이블 연결 (시험 핵심)
 # ==================================================
 
-# > 학생 + 전공 테이블 조인
+# > 학생 + 전공 테이블 INNER JOIN
 SELECT s.name, 
     m.major_name 
 FROM student s 
-JOIN major m ON s.major_id = m.id;
--- student 테이블과 major 테이블을 조인하여 학생 이름과 전공명 조회
+JOIN major m 
+    ON s.major_id = m.id;
+-- student 테이블과 major 테이블을 조인하여 학생 이름과 전공명 조회 (공통값만)
+
+
+# > 학생 + 전공 테이블 LEFT JOIN
+SELECT s.name, 
+       m.major_name 
+FROM student s 
+LEFT JOIN major m 
+    ON s.major_id = m.id;
+-- student 테이블의 모든 행과 일치하는 major 값 조회, 없는 경우 NULL
+
+
+# > 학생 + 전공 테이블 RIGHT JOIN
+SELECT s.name, 
+       m.major_name 
+FROM student s 
+RIGHT JOIN major m 
+    ON s.major_id = m.id;
+-- major 테이블의 모든 행과 일치하는 student 값 조회, 없는 경우 NULL
+
+-- LEFT JOIN → 모든 학생 포함
+-- | name | major_name |
+-- |------|------------|
+-- | 철수 | 컴퓨터공학 |
+-- | 영희 | NULL |
+-- | 민수 | 수학 |
+
+-- RIGHT JOIN → 모든 전공 포함
+-- | name | major_name |
+-- |------|------------|
+-- | 철수 | 컴퓨터공학 |
+-- | 민수 | 수학 |
+-- | NULL | 물리 |
+
+
+# > 학생 테이블 SELF JOIN (선배-후배 관계)
+SELECT s1.name AS student_name,
+       s2.name AS mentor_name
+FROM student s1
+JOIN student s2
+    ON s1.mentor_id = s2.id;
+-- student 테이블을 자기 자신과 조인하여 학생과 멘토(선배) 관계 조회
+
+
+# > 학생 + 전공 테이블 FULL OUTER JOIN
+SELECT s.name, 
+       m.major_name 
+FROM student s 
+FULL OUTER JOIN major m 
+    ON s.major_id = m.id;
+-- student와 major 테이블의 모든 행 조회, 없는 값은 NULL
+
+
+# > 학생 + 전공 테이블 CROSS JOIN
+SELECT s.name,
+       m.major_name
+FROM student s
+CROSS JOIN major m;
+-- student와 major의 모든 조합 생성 (조건 없음)
+
+
+
+# ==================================================
+# - VIEW : 가상의 테이블 생성
+# ==================================================
+
+# > 학생 이름과 학년만 조회하는 뷰 생성
+CREATE VIEW student_view AS
+SELECT name, grade
+FROM student;
+-- student 테이블에서 name, grade 컬럼만 뽑아 student_view라는 가상 테이블 생성
+
+
+# > 뷰에서 데이터 조회
+SELECT * 
+FROM student_view;
+-- student_view 뷰를 조회하면 name과 grade 컬럼만 나온다
+
+
+# > 뷰에 조건 걸어 조회
+SELECT * 
+FROM student_view
+WHERE grade = 3;
+-- student_view에서 학년이 3인 학생만 조회
+
+
+# > 뷰를 이용해 정렬
+SELECT * 
+FROM student_view
+ORDER BY name ASC;
+-- student_view에서 이름 기준 오름차순 정렬
 
 
 
@@ -265,8 +390,6 @@ JOIN major m ON s.major_id = m.id;
 SELECT * FROM student 
 WHERE grade > (
     SELECT AVG(grade) FROM student
-);
+);3
 -- 전체 학생 평균 학년보다 높은 학생 조회
-
-
 
