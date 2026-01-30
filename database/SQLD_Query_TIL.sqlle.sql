@@ -1,4 +1,8 @@
 -- DDL: 데이터베이스의 구조(테이블) 를 정의하는 명령어
+# 데이터베이스 생성
+CREATE DATABASE postgres;
+
+
 # 기본적인 테이블 생성
 -- 전공 테이블
 CREATE TABLE major (
