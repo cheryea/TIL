@@ -78,7 +78,7 @@ student    N ── M Course (FavoriteCourse)
 student    N ── M Teacher (FavoriteTeacher)
 ```
 
-
+![alt text](lms.drawio.png)
 
 # LMS - API Spec
 ## GET / (메인 페이지)
