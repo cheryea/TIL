@@ -1,8 +1,11 @@
 from fastapi import FastAPI
 from posts.post_api import router as post_router
+from pydantic.post_api import router as pydantic_router
 
 app = FastAPI()
 app.include_router(post_router)
+app.include_router(pydantic_router)
+
 
 
 @app.get("/")
