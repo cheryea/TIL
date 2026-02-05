@@ -10,16 +10,20 @@ def create_post(data: PostCreate):
     return post_service.create_post(data)
 
 # data: PostCreate
-# - 클라이언트가 보낸 JSON 요청 데이터를
-# - PostCreate 객체로 변환해서 받음
+# - 클라이언트가 보낸 JSON 데이터를
+# - Pydantic 모델인 PostCreate 객체로 변환하여 받음
 
 # return post_service.create_post(data)
-# - service에서 비즈니스 로직을 처리한 결과를 반환
+# - service 계층에서 비즈니스 로직을 처리하고
+#   처리 결과를 반환함
 
 # response_model=PostDetailResponse
-# - router는 그 결과를 PostDetailResponse 형식으로 직렬화해서
-#   클라이언트(JSON)에게 응답함
+# - 라우터는 반환된 결과를 PostDetailResponse 모델 형식으로 직렬화하여
+#   JSON 형태로 클라이언트에게 응답함
 
+# status_code=status.HTTP_201_CREATED
+# - 요청이 성공적으로 처리되어 새로운 리소스가 생성되었음을
+#   나타내는 HTTP 상태 코드 201(Created)을 클라이언트에게 반환
 
 
 @router.get("", response_model=list[PostListResponse])
