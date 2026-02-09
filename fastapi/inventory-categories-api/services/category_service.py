@@ -14,7 +14,7 @@ from inventory.repositories import product_repository
 
 class CategoryService:
 
-    # 카테고리 검증 메서드
+    # 카테고리 검증 후 반환 메서드
     def _get_category_or_404(self, category_id: int) -> Category:
         category = category_repository.get_by_id(category_id)
         if not category:
@@ -28,7 +28,7 @@ class CategoryService:
     def create_category(self, data: CategoryCreate) -> CategoryDetailResponse:
         category = Category(
             category_id=None,
-            name=data.name,
+            category_name=data.category_name,
         )
         saved = category_repository.save(category)
         return self._to_detail_response(saved)
@@ -82,14 +82,14 @@ class CategoryService:
     # --------------------
     def _to_list_response(self, category: Category) -> CategoryListResponse:
         return CategoryListResponse(
-            id=category.id,
-            name=category.name,
+            category_id=category.category_id,
+            category_name=category.category_name,
         )
 
     def _to_detail_response(self, category: Category) -> CategoryDetailResponse:
         return CategoryDetailResponse(
-            id=category.id,
-            name=category.name,
+            category_id=category.category_id,
+            category_name=category.category_name,
         )
 
 
