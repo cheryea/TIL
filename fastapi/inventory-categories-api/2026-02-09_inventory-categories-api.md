@@ -13,6 +13,8 @@
 ### 2. 가격 검증 로직
 - 상품 가격과 할인 가격을 검증 (`discount_price <= price`)  
 - 잘못된 가격 데이터 입력을 방지하여 **비즈니스 로직 안정성 확보**
+- `final_price` 자동 계산: `price - discount_price`
+- 재고가 0이면 품절 처리 (`is_sold_out=True`)
 
 ### 3. 상품 리스트 조회 및 검색
 - 키워드 기반 검색 기능 지원 (최소 2자 입력)  
@@ -28,6 +30,85 @@
 - **FastAPI**: 빠르고 효율적인 API 서버 구축  
 - **Pydantic**: 데이터 검증 및 타입 안전성 제공  
 - 안정적이고 직관적인 API 문서(Swagger) 자동 생성
+
+### 6. 기타
+- 싱글톤 패턴 활용 → 임시 DB에서 카테고리/상품별 단일 객체 사용
+- 카테고리 삭제 시 해당 카테고리에 상품이 존재하면 삭제 불가 오류 처리
+- 카테고리 조회 시, `category_id` 검증 후 이름 및 상품 정보 응답
+
+## 3. API 엔드포인트
+
+### 카테고리
+| Method | Path | 설명 | 요청/파라미터 | 응답 |
+|--------|------|------|----------------|------|
+| POST   | /categories | 카테고리 등록 | Body: CategoryCreate | CategoryDetailResponse |
+| GET    | /categories | 카테고리 전체 목록 조회 | - | list[CategoryListResponse] |
+| GET    | /categories/{id} | 단일 카테고리 조회 | Path: id | CategoryDetailResponse |
+| PUT    | /categories/{id} | 카테고리 이름 수정 | Body: CategoryUpdate, Path: id | CategoryDetailResponse |
+| DELETE | /categories/{id} | 카테고리 삭제 (상품 존재 시 오류) | Path: id | HTTP 204 |
+
+예시: CategoryCreate
+```json
+{
+  "name": "전자제품"
+}
+```
+예시: CategoryDetailResponse
+
+```json
+{
+  "id": 1,
+  "name": "전자제품"
+}
+```
+### 상품 (카테고리 하위 리소스)
+| Method | Path | 설명 | 요청/파라미터 | 응답 |
+|--------|------|------|----------------|------|
+| POST   | /categories/{category_id}/products | 카테고리 내 상품 등록 | Body: ProductCreate, Path: category_id | ProductDetailResponse |
+| GET    | /categories/{category_id}/products | 카테고리 내 상품 목록 조회 | Path: category_id, Query: keyword, limit (default=20, max=100) | list[ProductListResponse] |
+| GET    | /categories/{category_id}/products/{id} | 단일 상품 상세 조회 | Path: category_id, id | ProductDetailResponse |
+| PUT    | /categories/{category_id}/products/{id} | 단일 상품 수정 | Body: ProductUpdate, Path: category_id, id | ProductDetailResponse |
+| DELETE | /categories/{category_id}/products/{id} | 단일 상품 삭제 | Path: category_id, id | HTTP 204 |
+
+예시: ProductCreate
+```json
+{
+  "name": "기계식 키보드",
+  "price": 120000,
+  "discount_price": 20000,
+  "stock": 50
+}
+```
+
+예시: ProductDetailResponse
+```json
+{
+  "id": 1,
+  "name": "기계식 키보드",
+  "final_price": 100000,
+  "category": "전자제품",
+  "stock": 50,
+  "is_sold_out": false
+}
+```
+
+예시: ProductListResponse
+```json
+[
+  {
+    "id": 1,
+    "name": "기계식 키보드",
+    "final_price": 100000,
+    "category": "전자제품"
+  },
+  {
+    "id": 2,
+    "name": "텀블러",
+    "final_price": 22500,
+    "category": "생활용품"
+  }
+]
+```
 
 ## 현재 프로젝트 구조 (예시)
 ```
