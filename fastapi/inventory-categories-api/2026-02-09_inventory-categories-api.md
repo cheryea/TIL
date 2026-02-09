@@ -1,8 +1,9 @@
 # inventory-categories-api 
 (product-management-api 업그레이드 버전)
+이전 버전: <a href="https://github.com/cheryea/TIL/tree/main/fastapi/product-management-api" target="_blank">product-management-api</a>
 
 ## 프로젝트 개요
-기존 Product Management System을 업그레이드하여, 카테고리 기반 CRUD와 가격 검증 로직, 검색/조회 기능을 강화한 상품 관리 API 프로젝트입니다.
+기존 Product Management System을 업그레이드하여, 카테고리 기반 CRUD와 가격 검증 로직, 검색/조회 기능을 강화한 상품 관리 API 프로젝트입니다. FastAPI와 Pydantic 기반으로 안정적이고 직관적인 API 서버를 구축했으며, 서비스-레포지토리 계층을 분리하여 유지보수성과 테스트 용이성을 확보했습니다.
 
 ## 주요 기능
 ### 1. 카테고리 기반 CRUD
@@ -50,15 +51,15 @@
 예시: CategoryCreate
 ```json
 {
-  "name": "전자제품"
+  "category_name": "전자제품"
 }
 ```
 예시: CategoryDetailResponse
 
 ```json
 {
-  "id": 1,
-  "name": "전자제품"
+  "category_id": 1,
+  "category_name": "전자제품"
 }
 ```
 ### 상품 (카테고리 하위 리소스)
@@ -74,8 +75,8 @@
 ```json
 {
   "name": "기계식 키보드",
-  "price": 120000,
-  "discount_price": 20000,
+  "price": 125000,
+  "discount_price": 25000,
   "stock": 50
 }
 ```
@@ -85,6 +86,8 @@
 {
   "id": 1,
   "name": "기계식 키보드",
+  "price": 125000,
+  "discount_price": 25000,
   "final_price": 100000,
   "category": "전자제품",
   "stock": 50,
@@ -103,9 +106,9 @@
   },
   {
     "id": 2,
-    "name": "텀블러",
-    "final_price": 22500,
-    "category": "생활용품"
+    "name": "마우스",
+    "final_price": 95000,
+    "category": "전자제품"
   }
 ]
 ```
