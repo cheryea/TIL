@@ -21,7 +21,7 @@ class ProductService:
             id=product.id,
             name=product.name,
             final_price=product.price - product.discount_price,
-            category=category.name if category else "Unknown",
+            category=category.category_name if category else "Unknown",
         )
 
 
@@ -34,7 +34,7 @@ class ProductService:
             price=product.price,
             discount_price=product.discount_price,
             final_price=product.price - product.discount_price,
-            category=category.name if category else "Unknown",
+            category=category.category_name if category else "Unknown",
             stock=product.stock,
             is_sold_out=product.stock == 0,  # 0이면 True, 0이 아니면 False
         )
