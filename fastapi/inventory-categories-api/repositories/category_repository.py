@@ -15,7 +15,7 @@ class CategoryRepository:
     def save(self, new_category: Category) -> Category:
         # <-- db를 사용하면 없어질 로직
         self._id_counter += 1
-        new_category.id = self._id_counter
+        new_category.category_id = self._id_counter
         # -->
         self.categories.append(new_category)
         return new_category
@@ -33,7 +33,7 @@ class CategoryRepository:
     # -------------------------------
     def get_by_id(self, category_id: int) -> Optional[Category]:
         return next(
-            (c for c in self.categories if c.id == category_id),
+            (c for c in self.categories if c.category_id == category_id),
             None
         )
 
@@ -62,7 +62,7 @@ class CategoryRepository:
     # -------------------------------
     def delete(self, category_id: int) -> bool:
         for i, c in enumerate(self.categories):
-            if c.id == category_id:
+            if c.category_id == category_id:
                 self.categories.pop(i)
                 return True
         return False
