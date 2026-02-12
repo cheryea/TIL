@@ -143,9 +143,31 @@ WHERE major IS NULL;
 -- major 값이 NULL인 행 조회
 
 
+# > COALESCE: 컬럼 값이 NULL이면 지정한 값으로 대체
+# : COALESCE = NVL(Oracle 전용 함수)
+SELECT name,
+       COALESCE(major, '미정') AS 전공
+FROM student;
+-- major 컬럼이 NULL이면 '미정'으로 표시
+
+
+# > COALESCE: 숫자 컬럼에서 NULL이면 0으로 대체
+SELECT name,
+       COALESCE(mentor_id, 0) AS 멘토
+FROM student;
+-- mentor_id가 NULL이면 0으로 표시
+
+
 
 # ==================================================
 # - ORDER BY : 정렬
+# : 문자열 내림차순
+# : 1. 왼쪽 글자부터 비교
+# : 2. 글자가 다르면 그 글자 순서로 결정
+# : 3. 글자가 같으면 다음 글자 비교
+# : 4. 한쪽 문자열이 끝나면 → 짧은 문자열이 뒤로
+# : 'ㄱ','ㄴ','ㄷ','ㄹ','ㅁ','ㅂ'..
+# : '99', '9', '11', '1010', '101', '1000', '100', '10', '1'..
 # ==================================================
 
 # > 오름차순 정렬 (기본)
@@ -356,9 +378,14 @@ CROSS JOIN major m;
 
 # ==================================================
 # - VIEW : 가상의 테이블 생성
+# : 뷰(View) = 실제 테이블 데이터를 SELECT문을 기반으로 만든 가상 테이블
+# : 실제 데이터는 저장되지 않고, 조회 시 계산되어 보여짐
+# : 복잡한 SELECT, JOIN, GROUP BY, 집계 함수 등을 단순화 가능
+# : 하나 이상의 테이블을 조합한 복합뷰 생성 가능하지만 DML 제약이 생김
 # ==================================================
 
-# > 학생 이름과 학년만 조회하는 뷰 생성
+
+# > 학생 이름과 학년만 조회하는 뷰 생성 (복합뷰)
 CREATE VIEW student_view AS
 SELECT name, grade
 FROM student;
@@ -394,6 +421,6 @@ ORDER BY name ASC;
 SELECT * FROM student 
 WHERE grade > (
     SELECT AVG(grade) FROM student
-);3
+);
 -- 전체 학생 평균 학년보다 높은 학생 조회
 
