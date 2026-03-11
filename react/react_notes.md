@@ -40,8 +40,10 @@ onClick={handleClick}
 ```
 
 
+<br>
 
 ---
+<br>
 
 
 
@@ -82,8 +84,6 @@ const user = {
 
 `[key]`는 **변수 값을 key로 변환**한다.
 
----
-
 ### React에서 사용하는 이유
 React의 form에서는 input마다 `name`이 다르기 때문에
 어떤 값을 수정할지 **동적으로 결정해야 한다.**
@@ -100,9 +100,43 @@ setForm({
 <input name="email" />
 <input name="name" />
 ```
-
 입력된 input의 `name`에 따라 **업데이트할 key가 자동으로 바뀐다.**
 
 * `name:` → 고정된 key
 * `[name]:` → 변수 값을 key로 사용
 
+
+
+
+<br>
+
+---
+<br>
+
+
+
+
+## 상태(state) 직접 변경 x
+### 잘못된 방법 (❌)
+```javascript
+const [count, setCount] = useState(0);
+
+count = 5;         // 직접 변경 ❌
+foods.sort(...);   // 원본 배열 직접 변경 ❌
+```
+React는 state가 **불변(immutable)**이라고 가정하고 렌더링을 최적화합니다.
+직접 바꾸면 렌더링이 안 되거나 버그가 생길 수 있습니다.
+
+### 올바른 방법 (✅)
+```javascript
+setCount(5);                  // set 함수로 변경
+setFoods([...foods].sort(...)); // 복사 후 변경
+```
+React에서는 렌더링 중 원본 state를 변경하지 않고, 복사한 배열을 정렬해야 안전
+항상 set 함수를 통해 변경
+배열/객체는 새로운 복사본을 만들어서 변경
+
+### 핵심 포인트
+state는 읽기 전용 → 변경할 땐 항상 setState와 복사본 사용
+객체/배열 → spread(...) 사용
+원시값 → set 함수 사용
